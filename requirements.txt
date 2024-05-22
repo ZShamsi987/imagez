@@ -4,7 +4,7 @@ pillow==8.3.1
 tensorflow-cpu==2.5.0
 scikit-learn==0.24.2
 SQLAlchemy==1.4.22
-numpy==1.19.5
+scipy==1.7.0
 setuptools>=42
 wheel
 
