@@ -1,6 +1,7 @@
 streamlit==1.10.0
-opencv-python==4.5.3.56
+opencv-python-headless==4.5.3.56
 pillow==8.3.1
 tensorflow==2.5.0
 scikit-learn==0.24.2
 SQLAlchemy==1.4.22
+numpy==1.21.0
