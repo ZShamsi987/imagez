@@ -95,6 +95,30 @@ if st.session_state.button_clicked == 'Label':
     else:
         st.warning("Please upload an image first.")
 
+# Function to display saved images and labels
+def display_saved_images():
+    try:
+        conn = sqlite3.connect('image_recognition.db')
+        c = conn.cursor()
+        c.execute('SELECT label, image_path, annotated_image_path FROM images')
+        rows = c.fetchall()
+        conn.close()
+
+        if rows:
+            for row in rows:
+                label, image_path, annotated_image_path = row
+                st.write(f"Label: {label}")
+                st.image(image_path, caption=f'Original Image: {label}', use_column_width=True)
+                st.image(annotated_image_path, caption=f'Annotated Image: {label}', use_column_width=True)
+        else:
+            st.write("No images found in the database.")
+    except Exception as e:
+        st.error(f"An error occurred while fetching images: {e}")
+
+# Add a button to display saved images and labels
+if st.button('Show Saved Images'):
+    display_saved_images()
+
 # To reset the button click state
 def reset_button_state():
     st.session_state.button_clicked = None
