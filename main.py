@@ -53,42 +53,45 @@ def detect_and_annotate_image(image):
 # Handle the Label button click
 if st.session_state.button_clicked == 'Label':
     if uploaded_file is not None:
-        st.write("Photo uploaded")
-        # Display the uploaded image
-        image = Image.open(uploaded_file)
-        st.image(image, caption='Uploaded Photo', use_column_width=True)
-        # Text box for labeling the image
-        label = st.text_input("Enter a label for the image:")
-        if label:
-            # Annotate the image
-            annotated_image = detect_and_annotate_image(image)
-            st.image(annotated_image, caption=f'Labeled: {label}', use_column_width=True)
-            if st.button('Confirm'):
-                # Ensure directories exist
-                if not os.path.exists('uploaded_images'):
-                    os.makedirs('uploaded_images')
-                if not os.path.exists('annotated_images'):
-                    os.makedirs('annotated_images')
+        try:
+            st.write("Photo uploaded")
+            # Display the uploaded image
+            image = Image.open(uploaded_file)
+            st.image(image, caption='Uploaded Photo', use_column_width=True)
+            # Text box for labeling the image
+            label = st.text_input("Enter a label for the image:")
+            if label:
+                # Annotate the image
+                annotated_image = detect_and_annotate_image(image)
+                st.image(annotated_image, caption=f'Labeled: {label}', use_column_width=True)
+                if st.button('Confirm'):
+                    # Ensure directories exist
+                    if not os.path.exists('uploaded_images'):
+                        os.makedirs('uploaded_images')
+                    if not os.path.exists('annotated_images'):
+                        os.makedirs('annotated_images')
 
-                # Save the original and annotated images
-                image_path = os.path.join("uploaded_images", uploaded_file.name)
-                annotated_image_path = os.path.join("annotated_images", f"annotated_{uploaded_file.name}")
-                image.save(image_path)
-                annotated_image.save(annotated_image_path)
+                    # Save the original and annotated images
+                    image_path = os.path.join("uploaded_images", uploaded_file.name)
+                    annotated_image_path = os.path.join("annotated_images", f"annotated_{uploaded_file.name}")
+                    image.save(image_path)
+                    annotated_image.save(annotated_image_path)
 
-                # Save to database
-                conn = sqlite3.connect('image_recognition.db')
-                c = conn.cursor()
-                c.execute('''CREATE TABLE IF NOT EXISTS images 
-                             (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                              label TEXT, 
-                              image_path TEXT, 
-                              annotated_image_path TEXT)''')
-                c.execute('INSERT INTO images (label, image_path, annotated_image_path) VALUES (?, ?, ?)', 
-                          (label, image_path, annotated_image_path))
-                conn.commit()
-                conn.close()
-                st.success("Label saved successfully!")
+                    # Save to database
+                    conn = sqlite3.connect('image_recognition.db')
+                    c = conn.cursor()
+                    c.execute('''CREATE TABLE IF NOT EXISTS images 
+                                (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                                label TEXT, 
+                                image_path TEXT, 
+                                annotated_image_path TEXT)''')
+                    c.execute('INSERT INTO images (label, image_path, annotated_image_path) VALUES (?, ?, ?)', 
+                            (label, image_path, annotated_image_path))
+                    conn.commit()
+                    conn.close()
+                    st.success("Label saved successfully!")
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
     else:
         st.warning("Please upload an image first.")
 
